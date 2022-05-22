@@ -11,8 +11,13 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# db credentials
+from dev_settings import db_host, db_port, amazon_db_name, amazon_user, amazon_password
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+PROJECT_DIR = os.path.dirname(__file__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -37,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'amazon'
 ]
 
 MIDDLEWARE = [
@@ -77,6 +84,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'amazon': {
+        'NAME': amazon_db_name,
+        'USER': amazon_user,
+        'PASSWORD': amazon_password,
+        'HOST': db_host,
+        'PORT': db_port
     }
 }
 
@@ -117,7 +131,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
+MEDIA_URL = '/media/'
+
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_DIR, 'static'),
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
