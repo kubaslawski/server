@@ -86,6 +86,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
     'amazon': {
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': amazon_db_name,
         'USER': amazon_user,
         'PASSWORD': amazon_password,
