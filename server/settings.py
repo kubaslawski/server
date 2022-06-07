@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'amazon'
 ]
 
+REST_FRAMEWORK = {
+     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
+}
+
 AUTH_USER_MODEL = 'amazon.CustomUser'
 
 MIDDLEWARE = [

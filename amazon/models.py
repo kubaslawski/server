@@ -7,7 +7,7 @@ from .managers import CustomUserManager
 
 
 def user_directory_path(instance, filename):
-    return 'products/images/{0}'.format(instance)
+    return 'products/images/{0}'.format(filename)
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -15,6 +15,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    first_name = models.CharField(max_length=32, blank=True, null=True)
+    last_name = models.CharField(max_length=32, blank=True, null=True)
     is_seller = models.BooleanField(default=False)
     address = models.TextField(max_length=512)
 
