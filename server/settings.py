@@ -14,9 +14,9 @@ from pathlib import Path
 import os
 
 # db credentials
-from dev_settings import db_host, db_port, amazon_db_name, amazon_user, amazon_password
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 PROJECT_DIR = os.path.dirname(__file__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,8 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    # 'rest_framework.authtoken',
     'amazon'
 ]
+
+AUTH_USER_MODEL = 'amazon.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,16 +85,9 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'sql_mode': 'traditional',
-        },
-        'NAME': amazon_db_name,
-        'USER': amazon_user,
-        'PASSWORD': amazon_password,
-        'HOST': db_host,
-        'PORT': db_port
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 
@@ -140,6 +136,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, 'static'),
 )
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
