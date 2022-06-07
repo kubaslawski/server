@@ -6,6 +6,10 @@ from django.utils import timezone
 from .managers import CustomUserManager
 
 
+def user_directory_path(instance, filename):
+    return 'products/images/{0}'.format(instance)
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     is_staff = models.BooleanField(default=False)
@@ -43,6 +47,7 @@ class Product(models.Model):
     description = models.TextField(max_length=512, null=True, blank=True)
     stock = models.IntegerField(null=True, blank=True)
     price = models.FloatField(null=True, blank=True)
+    photo = models.FileField(upload_to=user_directory_path)
 
     def __str__(self):
         return self.name
