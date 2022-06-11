@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -44,15 +44,12 @@ class Comment(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     description = models.TextField(max_length=512, null=True, blank=True)
-    stock = models.IntegerField(null=True, blank=True)
-    price = models.FloatField(null=True, blank=True)
-    photo = models.FileField(upload_to=user_directory_path)
-
-    def __str__(self):
-        return self.name
+    stock = models.IntegerField(default=0)
+    price = models.FloatField()
+    photo = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.price = round(self.price, 2)

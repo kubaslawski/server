@@ -28,17 +28,26 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    seller = CustomUserSerializer(read_only=True)
+    # seller_data = serializers.SerializerMethodField(read_only=True)
+    photo = serializers.ImageField(required=False)
 
     class Meta:
         model = Product
         fields = [
             'id',
-            'category',
             'seller',
+            'category',
             'name',
             'description',
             'stock',
             'price',
             'photo'
         ]
+
+    # def get_seller_data(self, obj):
+    #     email = None
+    #     if obj.seller.email:
+    #         email = obj.seller.email
+    #     return {
+    #         'email': email
+    #     }
