@@ -1,13 +1,11 @@
 from rest_framework import generics, mixins
-from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
 
-from .models import CustomUser, Product
-from .serializers import CustomUserSerializer, ProductSerializer
+from .models import CustomUser, Product, Category
+from .serializers import CustomUserSerializer, ProductSerializer, CategorySerializer
 
-from django.conf import settings
-from django.conf.urls.static import static
 from django.shortcuts import get_object_or_404
+
 
 class CustomUserAPIView(
     mixins.ListModelMixin,
@@ -47,7 +45,6 @@ class ProductAPIView(
         return self.list(request)
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         return self.create(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
@@ -61,5 +58,24 @@ class ProductAPIView(
                 product.photo.delete()
         return self.destroy(request, *args, **kwargs)
 
+
+class CategoryAPIView(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    generics.GenericAPIView
+    ):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        if pk is not None:
+            obj = get_object_or_404(pk=pk)
+            if obj:
+                return self.retrieve(request)
+        return self.list(request)
+
+
 user_api_view = CustomUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
+category_api_view = CategoryAPIView.as_view()
