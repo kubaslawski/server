@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from datetime import datetime
+from django.db.models import Avg
 
-from .models import CustomUser, Category, Product
+from .models import CustomUser, Category, Product, Rate
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -41,6 +41,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
+    product_rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
@@ -52,5 +53,12 @@ class ProductSerializer(serializers.ModelSerializer):
             'description',
             'stock',
             'price',
-            'photo'
+            'photo',
+            'product_rating'
         ]
+
+    def get_product_rating(self, obj):
+        rate = Rate.objects.filter(product=obj.pk)
+        rate_count = rate.count()
+        avg_rate = rate.aggregate(average_price=Avg('rate'))
+        return {'avg_rate': avg_rate['average_price'], 'rate_count': rate_count}

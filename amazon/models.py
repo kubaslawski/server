@@ -47,9 +47,6 @@ class Rate(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.content
-
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
