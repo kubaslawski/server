@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from datetime import datetime
 
-from .models import CustomUser, Category, Comment, Product
+from .models import CustomUser, Category, Product
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -27,8 +27,19 @@ class CustomUserSerializer(serializers.ModelSerializer):
         ]
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    value = serializers.CharField(source='pk', read_only=True)
+    label = serializers.CharField(source='title', read_only=True)
+
+    class Meta:
+        model = Category
+        fields = [
+            'value',
+            'label'
+        ]
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    # seller_data = serializers.SerializerMethodField(read_only=True)
     photo = serializers.ImageField(required=False)
 
     class Meta:
@@ -43,11 +54,3 @@ class ProductSerializer(serializers.ModelSerializer):
             'price',
             'photo'
         ]
-
-    # def get_seller_data(self, obj):
-    #     email = None
-    #     if obj.seller.email:
-    #         email = obj.seller.email
-    #     return {
-    #         'email': email
-    #     }

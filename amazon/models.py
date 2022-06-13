@@ -5,6 +5,13 @@ from django.utils import timezone
 
 from .managers import CustomUserManager
 
+RATE_CHOICES = [
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5')
+]
 
 def user_directory_path(instance, filename):
     return 'products/images/{0}'.format(filename)
@@ -33,10 +40,12 @@ class Category(models.Model):
         return self.title
 
 
-class Comment(models.Model):
+class Rate(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField(max_length=512, null=True, blank=True)
+    rate = models.IntegerField(choices=RATE_CHOICES)
     created = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.content
