@@ -54,6 +54,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
     seller = SellerSerializer(read_only=True, required=False)
+    category = CategorySerializer(read_only=True, required=False)
     product_rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
