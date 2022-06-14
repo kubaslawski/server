@@ -9,6 +9,7 @@ urlpatterns = [
     path('users/<int:pk>/', user_api_view),
     path('products/', product_api_view),
     path('products/<int:pk>/', product_api_view),
+    path('products/category/<int:category_pk>/', product_api_view),
     path('categories/', category_api_view),
     path('categories/<int:pk>/', category_api_view),
 ]

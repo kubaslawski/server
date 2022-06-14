@@ -2,7 +2,7 @@ from rest_framework import generics, mixins
 from rest_framework.parsers import FormParser, MultiPartParser
 
 from .models import CustomUser, Product, Category
-from .serializers import CustomUserSerializer, ProductSerializer, CategorySerializer
+from .serializers import CustomUserSerializer, ProductSerializer, CategorySerializer, ProductAddSerializer
 
 from django.shortcuts import get_object_or_404
 
@@ -40,14 +40,20 @@ class ProductAPIView(
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
-        if pk is not None:
+        category_pk = kwargs.get('category_pk')
+        if category_pk:
+            self.queryset = Product.objects.filter(category=category_pk)
+            return self.list(request)
+        if pk:
             return self.retrieve(request)
         return self.list(request)
 
     def post(self, request, *args, **kwargs):
+        self.serializer_class = ProductAddSerializer
         return self.create(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
+        self.serializer_class = ProductAddSerializer
         return self.update(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):

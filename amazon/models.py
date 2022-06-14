@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+
 from .managers import CustomUserManager
 
 RATE_CHOICES = [
@@ -12,6 +13,7 @@ RATE_CHOICES = [
     (4, '4'),
     (5, '5')
 ]
+
 
 def user_directory_path(instance, filename):
     return 'products/images/{0}'.format(filename)

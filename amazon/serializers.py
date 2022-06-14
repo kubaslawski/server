@@ -54,7 +54,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
     seller = SellerSerializer(read_only=True, required=False)
-    category = CategorySerializer(read_only=True, required=False)
+    category = CategorySerializer(read_only=True)
     product_rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -76,3 +76,20 @@ class ProductSerializer(serializers.ModelSerializer):
         rate_count = rate.count()
         avg_rate = rate.aggregate(average_price=Avg('rate'))
         return {'avg_rate': avg_rate['average_price'], 'rate_count': rate_count}
+
+
+class ProductAddSerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(required=False)
+
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'seller',
+            'category',
+            'name',
+            'description',
+            'stock',
+            'price',
+            'photo',
+        ]
