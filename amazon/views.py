@@ -1,10 +1,21 @@
 from rest_framework import generics, mixins
 from rest_framework.parsers import FormParser, MultiPartParser
+# authentication
 
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+# internal
 from .models import CustomUser, Product, Category
-from .serializers import CustomUserSerializer, ProductSerializer, CategorySerializer, ProductAddSerializer
-
+from .serializers import (
+    CustomUserSerializer,
+    ProductSerializer,
+    ProductAddSerializer,
+    CategorySerializer
+)
+# django
 from django.shortcuts import get_object_or_404
+
 
 
 class CustomUserAPIView(
@@ -80,6 +91,18 @@ class CategoryAPIView(
             if obj:
                 return self.retrieve(request)
         return self.list(request)
+
+
+class AuthView(generics.GenericAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        content = {
+            'user': str(request.user),
+            'auth': str(request.auth)
+        }
+        return Response(content)
 
 
 user_api_view = CustomUserAPIView.as_view()
