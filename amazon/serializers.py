@@ -1,7 +1,11 @@
 from rest_framework import serializers
+
 from django.db.models import Avg
+from django.contrib.auth import get_user_model # If used custom user model
 
 from .models import CustomUser, Category, Product, Rate
+
+UserModel = get_user_model()
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -23,8 +27,27 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'is_active',
             'date_joined',
             'is_seller',
-            'address',
         ]
+
+
+class CreateCustomUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+
+        return user
+
+    class Meta:
+        model = UserModel
+        fields = ("id", "email", "password")
+
+    def validate_password(self, value):
+        if len(value) < 6:
+            raise serializers.ValidationError("Password must have at least 6 characters")
 
 
 class SellerSerializer(serializers.ModelSerializer):
@@ -93,3 +116,4 @@ class ProductAddSerializer(serializers.ModelSerializer):
             'price',
             'photo',
         ]
+

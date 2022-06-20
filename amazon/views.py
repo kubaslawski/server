@@ -1,14 +1,18 @@
 from rest_framework import generics, mixins
+from rest_framework import status
 from rest_framework.parsers import FormParser, MultiPartParser
 # authentication
+from rest_framework.authtoken.models import Token
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 # internal
 from .models import CustomUser, Product, Category
 from .serializers import (
     CustomUserSerializer,
+    CreateCustomUserSerializer,
     ProductSerializer,
     ProductAddSerializer,
     CategorySerializer
@@ -17,24 +21,17 @@ from .serializers import (
 from django.shortcuts import get_object_or_404
 
 
-
 class CustomUserAPIView(
-    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
     generics.GenericAPIView
     ):
-    queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
-        if pk is not None:
+        if pk:
+            self.queryset = CustomUser.objects.get(pk=pk)
             return self.retrieve(request)
-        return self.list(request)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
 
 class ProductAPIView(
@@ -103,6 +100,7 @@ class AuthView(generics.GenericAPIView):
             'auth': str(request.auth)
         }
         return Response(content)
+
 
 
 user_api_view = CustomUserAPIView.as_view()
