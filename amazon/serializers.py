@@ -9,10 +9,6 @@ UserModel = get_user_model()
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    last_login = serializers.DateTimeField(read_only=True)
-    date_joined = serializers.DateTimeField(read_only=True)
-    is_superuser = serializers.BooleanField(read_only=True)
-    is_active = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = CustomUser
@@ -21,12 +17,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'last_login',
-            'is_superuser',
-            'is_staff',
-            'is_active',
-            'date_joined',
-            'is_seller',
         ]
 
 
