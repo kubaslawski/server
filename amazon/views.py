@@ -32,20 +32,15 @@ class CustomUserAPIView(
         if pk:
             self.queryset = CustomUser.objects.get(pk=pk)
             return self.retrieve(request)
+        else:
+            email = request.user
+            user = CustomUser.objects.get(email=email)
+            return Response({'user': user})
 
 
 class CustomUserByTokenAPIView(
     generics.GenericAPIView
     ):
-
-    def get(self, request, *args, **kwargs):
-        email = request.user
-        user = CustomUser.objects.get(email=email)
-        return Response({'user': user})
-
-
-class GetUserAPIView(APIView):
-    serializer_class = CustomUserSerializer
 
     def get(self, request, *args, **kwargs):
         email = request.user
@@ -123,6 +118,6 @@ class AuthView(generics.GenericAPIView):
 
 
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
-user_api_view = GetUserAPIView.as_view()
+# user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
 category_api_view = CategoryAPIView.as_view()
