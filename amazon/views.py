@@ -32,10 +32,16 @@ class CustomUserAPIView(
         if pk:
             self.queryset = CustomUser.objects.get(pk=pk)
             return self.retrieve(request)
-        else:
-            email = request.user
-            user = CustomUser.objects.get(email=email)
-            return Response({'user': user})
+
+
+class CustomUserByTokenAPIView(
+    generics.GenericAPIView
+    ):
+
+    def get(self, request, *args, **kwargs):
+        email = request.user
+        user = CustomUser.objects.get(email=email)
+        return Response({'user': user})
 
 
 class GetUserAPIView(APIView):
@@ -46,6 +52,7 @@ class GetUserAPIView(APIView):
         user = get_object_or_404(CustomUser, email=email)
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
+
 
 class ProductAPIView(
     mixins.ListModelMixin,
@@ -115,7 +122,7 @@ class AuthView(generics.GenericAPIView):
         return Response(content)
 
 
-
+user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
 category_api_view = CategoryAPIView.as_view()
