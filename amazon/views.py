@@ -170,7 +170,6 @@ class BasketAPIView(
                 return Response(serializer.data)
 
 
-
 class AuthView(generics.GenericAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]

@@ -40,17 +40,6 @@ class CreateCustomUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must have at least 6 characters")
 
 
-class SellerSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CustomUser
-        fields = [
-            'id',
-            'email',
-            'first_name',
-            'last_name',
-        ]
-
 
 class CategorySerializer(serializers.ModelSerializer):
     value = serializers.CharField(source='pk', read_only=True)
@@ -66,7 +55,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
-    seller = SellerSerializer(read_only=True, required=False)
     category = CategorySerializer(read_only=True)
     product_rating = serializers.SerializerMethodField(read_only=True)
 
@@ -74,7 +62,6 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id',
-            'seller',
             'category',
             'name',
             'description',
@@ -98,7 +85,6 @@ class ProductAddSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id',
-            'seller',
             'category',
             'name',
             'description',

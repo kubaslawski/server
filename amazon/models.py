@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from .managers import CustomUserManager
 
@@ -52,10 +54,14 @@ class Rate(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    seller = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=512, null=True, blank=True)
-    stock = models.IntegerField(default=0)
+    stock = models.IntegerField(
+        default=1,
+        validators=[
+            MaxValueValidator(100),
+            MinValueValidator(1)
+        ])
     price = models.FloatField()
     photo = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
 
