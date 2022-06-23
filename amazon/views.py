@@ -153,6 +153,8 @@ class BasketAPIView(
             if basket_product:
                 basket_product.quantity = basket_product.quantity + quantity
                 basket_product.save()
+                if basket_product.quantity == 0:
+                    basket_product.delete()
                 user = CustomUser.objects.get(email=request.user)
                 items = BasketItem.objects.filter(basket=user.id)
                 serializer = BasketItemSerializer(items, many=True)
