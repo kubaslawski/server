@@ -113,17 +113,16 @@ class CategoryAPIView(
 
 class BasketAPIView(
     generics.GenericAPIView,
+    mixins.ListModelMixin,
 ):
-
     serializer_class = BasketItemSerializer
 
     def get(self, request, *args, **kwargs):
         email = request.user
-        user = get_object_or_404(CustomUser, email=email)
-        basket = get_object_or_404(Basket, user=user)
-        items = BasketItem.objects.filter(basket=basket)
-        serializer = BasketItemSerializer(items, many=True)
-        return Response(serializer.data)
+        user = CustomUser.objects.get(email=email)
+        basket = Basket.objects.get(user=user)
+        self.queryset = BasketItem.objects.filter(basket=basket)
+        return self.list(request, *args, **kwargs)
 
     # 1. Check if basket exists
     # 2. If not - create a basket, then create product in basket
