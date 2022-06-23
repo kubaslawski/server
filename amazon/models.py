@@ -62,3 +62,13 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.price = round(self.price, 2)
         super(Product, self).save(*args, **kwargs)
+
+
+class Basket(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+
+class BasketItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    basket = models.ForeignKey(Basket, on_delete=models.CASCADE)
