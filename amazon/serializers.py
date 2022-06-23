@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from django.db.models import Avg
-from django.contrib.auth import get_user_model # If used custom user model
+from django.db.models import Avg, Sum
+from django.contrib.auth import get_user_model
 
 from .models import CustomUser, Category, Product, Rate, Basket, BasketItem
 
@@ -9,6 +9,7 @@ UserModel = get_user_model()
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    basket_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
@@ -17,7 +18,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'basket_count'
         ]
+
+    def get_basket_count(self, obj):
+        user = CustomUser.objects.get(email=obj)
+        basket = Basket.objects.get(user=user)
+        basket_count = BasketItem.objects.filter(basket=basket).aggregate(total_items=Sum('quantity'))
+        return basket_count['total_items']
 
 
 class CreateCustomUserSerializer(serializers.ModelSerializer):
@@ -38,7 +46,6 @@ class CreateCustomUserSerializer(serializers.ModelSerializer):
     def validate_password(self, value):
         if len(value) < 6:
             raise serializers.ValidationError("Password must have at least 6 characters")
-
 
 
 class CategorySerializer(serializers.ModelSerializer):
