@@ -9,13 +9,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 # internal
-from .models import CustomUser, Product, Category
+from .models import (
+    CustomUser,
+    Product,
+    Category,
+    Basket,
+    BasketItem,
+)
 from .serializers import (
     CustomUserSerializer,
     CreateCustomUserSerializer,
     ProductSerializer,
     ProductAddSerializer,
-    CategorySerializer
+    CategorySerializer,
+    BasketItemSerializer
 )
 # django
 from django.shortcuts import get_object_or_404
@@ -36,7 +43,6 @@ class CustomUserAPIView(
             email = request.user
             user = CustomUser.objects.get(email=email)
             return Response({'user': user})
-
 
 class CustomUserByTokenAPIView(
     generics.GenericAPIView
@@ -105,6 +111,66 @@ class CategoryAPIView(
         return self.list(request)
 
 
+class BasketAPIView(
+    generics.GenericAPIView,
+):
+
+    serializer_class = BasketItemSerializer
+
+    def get(self, request, *args, **kwargs):
+        email = request.user
+        user = get_object_or_404(CustomUser, email=email)
+        basket = get_object_or_404(Basket, user=user)
+        items = BasketItem.objects.filter(basket=basket)
+        serializer = BasketItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+    # 1. Check if basket exists
+    # 2. If not - create a basket, then create product in basket
+    # 3. If does - check if product is already in the basket
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.data['product']
+        product = Product.objects.get(pk=product_id)
+        quantity = int(request.data['quantity'])
+        user = CustomUser.objects.get(email=request.user)
+        user_basket = Basket.objects.filter(user=user).first()
+        if not user_basket:
+            user_basket = Basket.objects.create(
+                user=user
+            )
+            user_basket.save()
+            basket_item = BasketItem.objects.create(
+                basket=user_basket,
+                product=product,
+                quantity=quantity
+            )
+            basket_item.save()
+            items = BasketItem.objects.filter(basket=user.id)
+            serializer = BasketItemSerializer(items, many=True)
+            return Response(serializer.data)
+        else:
+            basket_product = BasketItem.objects.filter(basket=user_basket, product=product).first()
+            if basket_product:
+                basket_product.quantity = basket_product.quantity + quantity
+                basket_product.save()
+                user = CustomUser.objects.get(email=request.user)
+                items = BasketItem.objects.filter(basket=user.id)
+                serializer = BasketItemSerializer(items, many=True)
+                return Response(serializer.data)
+            else:
+                basket_item = BasketItem.objects.create(
+                    basket=user_basket,
+                    product=product,
+                    quantity=quantity
+                )
+                basket_item.save()
+                items = BasketItem.objects.filter(basket=user.id)
+                serializer = BasketItemSerializer(items, many=True)
+                return Response(serializer.data)
+
+
+
 class AuthView(generics.GenericAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
@@ -121,3 +187,4 @@ user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
 category_api_view = CategoryAPIView.as_view()
+user_basket_api_view = BasketAPIView.as_view()
