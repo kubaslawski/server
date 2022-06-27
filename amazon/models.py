@@ -21,6 +21,10 @@ def user_directory_path(instance, filename):
     return 'products/images/{0}'.format(filename)
 
 
+def category_directory_path(instance, filename):
+    return 'category/images/{0}'.format(filename)
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     is_staff = models.BooleanField(default=False)
@@ -39,6 +43,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Category(models.Model):
     title = models.CharField(max_length=200, null=True, blank=True)
+    photo = models.ImageField(upload_to=category_directory_path, blank=True, null=True)
 
     def __str__(self):
         return self.title
