@@ -101,6 +101,8 @@ class CategoryAPIView(
     ):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = []
+    authentication_classes = []
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
