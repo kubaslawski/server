@@ -51,12 +51,15 @@ class CreateCustomUserSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     value = serializers.CharField(source='pk', read_only=True)
     label = serializers.CharField(source='title', read_only=True)
+    photo = serializers.ImageField(required=False)
 
     class Meta:
         model = Category
         fields = [
             'value',
-            'label'
+            'label',
+            'photo',
+            'pk'
         ]
 
 

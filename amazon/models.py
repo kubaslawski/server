@@ -25,6 +25,10 @@ def category_directory_path(instance, filename):
     return 'category/images/{0}'.format(filename)
 
 
+def sub_category_directory_path(instance, filename):
+    return 'subcategory/images/{0}'.format(filename)
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     is_staff = models.BooleanField(default=False)
@@ -49,6 +53,14 @@ class Category(models.Model):
         return self.title
 
 
+class SubCategory(models.Model):
+    title = models.CharField(max_length=200, null=True, blank=True)
+    photo = models.ImageField(upload_to=sub_category_directory_path, blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Rate(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField(max_length=512, null=True, blank=True)
@@ -59,6 +71,7 @@ class Rate(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=512, null=True, blank=True)
     stock = models.IntegerField(
