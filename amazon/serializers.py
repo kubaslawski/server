@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.db.models import Avg, Sum
 from django.contrib.auth import get_user_model
 
-from .models import CustomUser, Category, Product, Rate, Basket, BasketItem
+from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory
 
 UserModel = get_user_model()
 
@@ -48,10 +48,23 @@ class CreateCustomUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must have at least 6 characters")
 
 
+class SubCategorySerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(required=False)
+
+    class Meta:
+        model = SubCategory
+        fields = [
+            'id',
+            'title',
+            'photo'
+        ]
+
+
 class CategorySerializer(serializers.ModelSerializer):
     value = serializers.CharField(source='pk', read_only=True)
     label = serializers.CharField(source='title', read_only=True)
     photo = serializers.ImageField(required=False)
+    sub_categories = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Category
@@ -59,13 +72,21 @@ class CategorySerializer(serializers.ModelSerializer):
             'value',
             'label',
             'photo',
+            'sub_categories',
             'pk'
         ]
+
+    def get_sub_categories(self, obj):
+        category = obj.pk
+        sub_categories = SubCategory.objects.filter(category=category)
+        serializer = SubCategorySerializer(sub_categories, many=True)
+        return serializer.data
 
 
 class ProductSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
     category = CategorySerializer(read_only=True)
+    sub_category = SubCategorySerializer()
     product_rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -73,6 +94,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'category',
+            'sub_category',
             'name',
             'description',
             'stock',
