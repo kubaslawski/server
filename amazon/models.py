@@ -37,7 +37,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=32, blank=True, null=True)
     last_name = models.CharField(max_length=32, blank=True, null=True)
     is_seller = models.BooleanField(default=False)
-    address = models.TextField(max_length=512)
+    address = models.ForeignKey("Address", on_delete=models.CASCADE, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -97,3 +97,11 @@ class BasketItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     basket = models.ForeignKey(Basket, on_delete=models.CASCADE)
+
+
+class Address(models.Model):
+    country = models.CharField(max_length=32)
+    state = models.CharField(max_length=64)
+    city = models.CharField(max_length=64)
+    street = models.CharField(max_length=64)
+    post_code = models.CharField(_("post_code"), max_length=5)

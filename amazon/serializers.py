@@ -3,13 +3,27 @@ from rest_framework import serializers
 from django.db.models import Avg, Sum
 from django.contrib.auth import get_user_model
 
-from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory
+from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory, Address
 
 UserModel = get_user_model()
 
 
+class AddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Address
+        fields = [
+            'country',
+            'state',
+            'city',
+            'street',
+            'post_code'
+        ]
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
     basket_count = serializers.SerializerMethodField(read_only=True)
+    address = AddressSerializer()
 
     class Meta:
         model = CustomUser
@@ -18,7 +32,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'basket_count'
+            'basket_count',
+            'address'
         ]
 
     def get_basket_count(self, obj):
@@ -169,4 +184,5 @@ class BasketItemSerializer(serializers.ModelSerializer):
             'quantity',
             'basket'
         ]
+
 
