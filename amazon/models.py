@@ -54,6 +54,7 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True, blank=True)
     photo = models.ImageField(upload_to=sub_category_directory_path, blank=True, null=True)
 
