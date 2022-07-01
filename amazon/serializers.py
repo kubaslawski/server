@@ -61,16 +61,13 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    value = serializers.CharField(source='pk', read_only=True)
-    label = serializers.CharField(source='title', read_only=True)
     photo = serializers.ImageField(required=False)
     sub_categories = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Category
         fields = [
-            'value',
-            'label',
+            'title',
             'photo',
             'sub_categories',
             'pk'
@@ -126,6 +123,32 @@ class ProductAddSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProductListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    sub_category = SubCategorySerializer(read_only=True)
+    product_rating = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'category',
+            'sub_category',
+            'name',
+            'description',
+            'stock',
+            'price',
+            'photo',
+            'product_rating'
+        ]
+
+    def get_product_rating(self, obj):
+        rate = Rate.objects.filter(product=obj.pk)
+        rate_count = rate.count()
+        avg_rate = rate.aggregate(average_price=Avg('rate'))
+        return {'avg_rate': avg_rate['average_price'], 'rate_count': rate_count}
+
+
 class BasketSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
@@ -146,3 +169,4 @@ class BasketItemSerializer(serializers.ModelSerializer):
             'quantity',
             'basket'
         ]
+

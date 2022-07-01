@@ -20,6 +20,7 @@ from .serializers import (
     CustomUserSerializer,
     CreateCustomUserSerializer,
     ProductSerializer,
+    ProductListSerializer,
     ProductAddSerializer,
     CategorySerializer,
     BasketItemSerializer
@@ -68,6 +69,7 @@ class ProductAPIView(
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        self.serializer_class = ProductListSerializer
         pk = kwargs.get('pk')
         category_pk = kwargs.get('category_pk')
         if category_pk:
