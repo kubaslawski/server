@@ -187,8 +187,25 @@ class AuthView(generics.GenericAPIView):
         return Response(content)
 
 
+class SearchProductListView(generics.GenericAPIView):
+    serializer_class = ProductListSerializer
+    queryset = Product.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        q = self.request.GET.get('q')
+        print(q)
+        if q is not None:
+            user = None
+            if self.request.user.is_authenticated:
+                user = self.request.user
+            results = Product.objects.filter(name__contains=q)
+            serializer = self.serializer_class(results, many=True)
+        return Response(serializer.data)
+
+
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
 category_api_view = CategoryAPIView.as_view()
 user_basket_api_view = BasketAPIView.as_view()
+product_search_api_view = SearchProductListView.as_view()
