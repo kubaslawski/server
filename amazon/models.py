@@ -105,3 +105,9 @@ class Address(models.Model):
     city = models.CharField(max_length=64)
     street = models.CharField(max_length=64)
     post_code = models.CharField(_("post_code"), max_length=5)
+
+
+class PurchasedProduct(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()

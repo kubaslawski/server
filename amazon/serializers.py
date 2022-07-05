@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.db.models import Avg, Sum
 from django.contrib.auth import get_user_model
 
-from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory, Address
+from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory, Address, PurchasedProduct
 
 UserModel = get_user_model()
 
@@ -185,4 +185,14 @@ class BasketItemSerializer(serializers.ModelSerializer):
             'basket'
         ]
 
+
+class ProductPurchasedSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = PurchasedProduct
+        fields = [
+            'product',
+            'quantity'
+        ]
 

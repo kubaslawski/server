@@ -10,7 +10,8 @@ from .views import  (
     category_api_view,
     user_by_token_api_view,
     user_basket_api_view,
-    product_search_api_view
+    product_search_api_view,
+    my_purchased_products_api_view
 )
 
 urlpatterns = [
@@ -23,6 +24,7 @@ urlpatterns = [
     path('categories/<int:pk>/', category_api_view),
     path('basket/', user_basket_api_view),
     path('search/products/', product_search_api_view),
+    path('my-purchased-products/', my_purchased_products_api_view),
     # authentication
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh_view'),

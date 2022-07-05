@@ -15,6 +15,7 @@ from .models import (
     Category,
     Basket,
     BasketItem,
+    PurchasedProduct
 )
 from .serializers import (
     CustomUserSerializer,
@@ -23,7 +24,8 @@ from .serializers import (
     ProductListSerializer,
     ProductAddSerializer,
     CategorySerializer,
-    BasketItemSerializer
+    BasketItemSerializer,
+    ProductPurchasedSerializer
 )
 # django
 from django.shortcuts import get_object_or_404
@@ -203,9 +205,23 @@ class SearchProductListView(generics.GenericAPIView):
         return Response(serializer.data)
 
 
+class MyPurchasedProductsAPIView(generics.GenericAPIView):
+    serializer_class = ProductPurchasedSerializer
+
+    def get(self, request):
+        if request.user:
+            email = request.user
+            user = CustomUser.objects.get(email=email)
+            user_purchased_products = PurchasedProduct.objects.filter(user=user)
+            serializer = self.serializer_class(user_purchased_products, many=True)
+        return Response(serializer.data)
+
+
+
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
 category_api_view = CategoryAPIView.as_view()
 user_basket_api_view = BasketAPIView.as_view()
 product_search_api_view = SearchProductListView.as_view()
+my_purchased_products_api_view = MyPurchasedProductsAPIView.as_view()
