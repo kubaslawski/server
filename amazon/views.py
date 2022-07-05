@@ -217,6 +217,25 @@ class MyPurchasedProductsAPIView(generics.GenericAPIView):
         return Response(serializer.data)
 
 
+class CheckoutAPIView(generics.GenericAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if request.user:
+            email = request.user
+            user = CustomUser.objects.get(email=email)
+            basket = Basket.objects.get(user=user)
+            basket_items = BasketItem.objects.filter(basket=basket)
+            for i in basket_items:
+                PurchasedProduct.objects.create(
+                    user = user,
+                    product = i.product,
+                    quantity = i.quantity
+                )
+                i.delete()
+        return Response({})
+
 
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
@@ -225,3 +244,4 @@ category_api_view = CategoryAPIView.as_view()
 user_basket_api_view = BasketAPIView.as_view()
 product_search_api_view = SearchProductListView.as_view()
 my_purchased_products_api_view = MyPurchasedProductsAPIView.as_view()
+checkout_api_view = CheckoutAPIView.as_view()
