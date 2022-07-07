@@ -12,7 +12,8 @@ from .views import  (
     user_basket_api_view,
     product_search_api_view,
     my_purchased_products_api_view,
-checkout_api_view
+    checkout_api_view,
+    product_rate_api_view
 )
 
 urlpatterns = [
@@ -21,6 +22,8 @@ urlpatterns = [
     path('products/', product_api_view),
     path('products/<int:pk>/', product_api_view),
     path('products/category/<int:category_pk>/', product_api_view),
+    path('products/rate/', product_rate_api_view),
+    path('products/rate/<int:productId>', product_rate_api_view),
     path('categories/', category_api_view),
     path('categories/<int:pk>/', category_api_view),
     path('basket/', user_basket_api_view),

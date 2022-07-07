@@ -15,17 +15,21 @@ from .models import (
     Category,
     Basket,
     BasketItem,
-    PurchasedProduct
+    PurchasedProduct,
+    Rate
 )
 from .serializers import (
     CustomUserSerializer,
     CreateCustomUserSerializer,
     ProductSerializer,
+    SingleProductSerializer,
     ProductListSerializer,
     ProductAddSerializer,
     CategorySerializer,
     BasketItemSerializer,
-    ProductPurchasedSerializer
+    ProductPurchasedSerializer,
+    RateSerializer,
+    RateAddSerializer,
 )
 # django
 from django.shortcuts import get_object_or_404
@@ -78,6 +82,7 @@ class ProductAPIView(
             self.queryset = Product.objects.filter(category=category_pk)
             return self.list(request)
         if pk:
+            self.serializer_class = SingleProductSerializer
             return self.retrieve(request)
         return self.list(request)
 
@@ -237,6 +242,34 @@ class CheckoutAPIView(generics.GenericAPIView):
         return Response({})
 
 
+class ProductRateAPIView(
+    generics.GenericAPIView,
+    mixins.CreateModelMixin
+):
+    serializer_class = RateSerializer
+
+    def get(self, request, *args, **kwargs):
+        product_id = kwargs.get('productId')
+        if product_id:
+            rates = Rate.objects.filter(product=product_id)
+            serializer = self.serializer_class(rates, many=True)
+            return Response(serializer.data)
+        return Response(status=400)
+
+
+    def post(self, request, *args, **kwargs):
+        self.serializer_class = RateAddSerializer
+        print(request.data)
+        author = CustomUser.objects.get(id=request.data['author'])
+        product = Product.objects.get(id=request.data['product'])
+        is_user_already_rated_product = Rate.objects.filter(author=author, product=product).exists()
+        print("CHECK:", is_user_already_rated_product)
+        if is_user_already_rated_product:
+            content = {'errors': ["You have already rated this product"]}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        return self.create(request, *args, **kwargs)
+
+
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
@@ -245,3 +278,4 @@ user_basket_api_view = BasketAPIView.as_view()
 product_search_api_view = SearchProductListView.as_view()
 my_purchased_products_api_view = MyPurchasedProductsAPIView.as_view()
 checkout_api_view = CheckoutAPIView.as_view()
+product_rate_api_view = ProductRateAPIView.as_view()

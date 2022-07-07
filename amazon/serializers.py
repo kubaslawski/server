@@ -3,7 +3,17 @@ from rest_framework import serializers
 from django.db.models import Avg, Sum
 from django.contrib.auth import get_user_model
 
-from .models import CustomUser, Category, Product, Rate, Basket, BasketItem, SubCategory, Address, PurchasedProduct
+from .models import (
+    CustomUser,
+    Category,
+    Product,
+    Rate,
+    Basket,
+    BasketItem,
+    SubCategory,
+    Address,
+    PurchasedProduct,
+)
 
 UserModel = get_user_model()
 
@@ -164,6 +174,40 @@ class ProductListSerializer(serializers.ModelSerializer):
         return {'avg_rate': avg_rate['average_price'], 'rate_count': rate_count}
 
 
+class SingleProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    sub_category = SubCategorySerializer(read_only=True)
+    product_rating = serializers.SerializerMethodField(read_only=True)
+    rates = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'category',
+            'sub_category',
+            'name',
+            'description',
+            'stock',
+            'price',
+            'photo',
+            'product_rating',
+            'rates',
+        ]
+
+    def get_product_rating(self, obj):
+        rate = Rate.objects.filter(product=obj.pk)
+        rate_count = rate.count()
+        avg_rate = rate.aggregate(average_price=Avg('rate'))
+        return {'avg_rate': avg_rate['average_price'], 'rate_count': rate_count}
+
+    def get_rates(self, obj):
+        product = obj
+        rates = Rate.objects.filter(product=product)
+        serializer = RateSerializer(rates, many=True)
+        return serializer.data
+
+
 class BasketSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
@@ -196,3 +240,40 @@ class ProductPurchasedSerializer(serializers.ModelSerializer):
             'quantity'
         ]
 
+
+class CustomUserAsRateAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name'
+        ]
+
+
+class RateSerializer(serializers.ModelSerializer):
+    author = CustomUserAsRateAuthorSerializer()
+
+    class Meta:
+        model = Rate
+        fields = [
+            'id',
+            'author',
+            'content',
+            'rate',
+            'created',
+        ]
+
+
+class RateAddSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rate
+        fields = [
+            'author',
+            'content',
+            'rate',
+            'created',
+            'product'
+        ]
