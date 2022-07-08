@@ -167,7 +167,8 @@ class BasketAPIView(
                 if basket_product.quantity == 0:
                     basket_product.delete()
                 user = CustomUser.objects.get(email=request.user)
-                items = BasketItem.objects.filter(basket=user.id)
+                items = BasketItem.objects.filter(basket=user_basket)
+                print(items)
                 serializer = BasketItemSerializer(items, many=True)
                 return Response(serializer.data)
             else:
@@ -177,7 +178,7 @@ class BasketAPIView(
                     quantity=quantity
                 )
                 basket_item.save()
-                items = BasketItem.objects.filter(basket=user.id)
+                items = BasketItem.objects.filter(basket=user_basket)
                 serializer = BasketItemSerializer(items, many=True)
                 return Response(serializer.data)
 
