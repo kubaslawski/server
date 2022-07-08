@@ -168,7 +168,6 @@ class BasketAPIView(
                     basket_product.delete()
                 user = CustomUser.objects.get(email=request.user)
                 items = BasketItem.objects.filter(basket=user_basket)
-                print(items)
                 serializer = BasketItemSerializer(items, many=True)
                 return Response(serializer.data)
             else:
@@ -201,7 +200,6 @@ class SearchProductListView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         q = self.request.GET.get('q')
-        print(q)
         if q is not None:
             user = None
             if self.request.user.is_authenticated:
@@ -260,11 +258,9 @@ class ProductRateAPIView(
 
     def post(self, request, *args, **kwargs):
         self.serializer_class = RateAddSerializer
-        print(request.data)
         author = CustomUser.objects.get(id=request.data['author'])
         product = Product.objects.get(id=request.data['product'])
         is_user_already_rated_product = Rate.objects.filter(author=author, product=product).exists()
-        print("CHECK:", is_user_already_rated_product)
         if is_user_already_rated_product:
             content = {'errors': ["You have already rated this product"]}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
