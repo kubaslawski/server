@@ -232,11 +232,16 @@ class CheckoutAPIView(generics.GenericAPIView):
             basket = Basket.objects.get(user=user)
             basket_items = BasketItem.objects.filter(basket=basket)
             for i in basket_items:
-                PurchasedProduct.objects.create(
-                    user = user,
-                    product = i.product,
-                    quantity = i.quantity
-                )
+                purchased_product = PurchasedProduct.objects.get(product=i.product)
+                if purchased_product:
+                    purchased_product.quantity = purchased_product.quantity + i.quantity
+                    purchased_product.save()
+                else:
+                    PurchasedProduct.objects.create(
+                        user = user,
+                        product = i.product,
+                        quantity = i.quantity
+                    )
                 i.delete()
         return Response({})
 
