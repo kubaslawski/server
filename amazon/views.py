@@ -4,6 +4,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.views import APIView
 
 # authentication
+from rest_framework import permissions
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -35,6 +36,31 @@ from .serializers import (
 from django.shortcuts import get_object_or_404
 
 
+class CreateUserAPIView(generics.CreateAPIView):
+    # queryset = CustomUser.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    authentication_classes = []
+    serializer_class = CreateCustomUserSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(
+            data=request.data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
+        user = CustomUser.objects.create_user(
+            email=email,
+            password=password
+        )
+        return Response({
+            'email': user.email,
+        })
+
+
 class CustomUserAPIView(
     mixins.RetrieveModelMixin,
     generics.GenericAPIView
@@ -50,6 +76,7 @@ class CustomUserAPIView(
             email = request.user
             user = CustomUser.objects.get(email=email)
             return Response({'user': user})
+
 
 class CustomUserByTokenAPIView(
     generics.GenericAPIView
@@ -272,6 +299,7 @@ class ProductRateAPIView(
         return self.create(request, *args, **kwargs)
 
 
+create_user_api_view = CreateUserAPIView.as_view()
 user_by_token_api_view = CustomUserByTokenAPIView.as_view()
 # user_api_view = GetUserAPIView.as_view()
 product_api_view = ProductAPIView.as_view()
